@@ -1,7 +1,8 @@
 name: Fetch Binance Options Data
 
 on:
-  workflow_dispatch:  # 手动触发
+  push:        # 每次push自动触发
+  workflow_dispatch:
   schedule:
     - cron: '0 */1 * * *'  # 每1小时自动运行（可选）
 
