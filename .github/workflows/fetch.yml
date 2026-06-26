@@ -18,9 +18,11 @@ jobs:
           python-version: '3.11'
       
       - name: Fetch Binance Options Data
-        run: python3 fetch_binance.py
+        run: python3 fetch_binance.py 2>&1 | tee data/fetch_log.txt
+        continue-on-error: true
       
       - name: Commit and Push Results
+        if: always()
         run: |
           git config user.name "Binance Bridge Bot"
           git config user.email "bot@binance-bridge.local"
