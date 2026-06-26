@@ -5,14 +5,21 @@ on: push
 jobs:
   diag:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
-      - run: bash diag.sh 2>&1 | tee data/diag_log.txt
-        continue-on-error: true
-      - if: always()
-        run: |
+      - run: |
+          mkdir -p data
+          echo "=== ENV ===" > data/diag_log.txt
+          uname -a >> data/diag_log.txt
+          python3 --version >> data/diag_log.txt
+          echo "=== BINANCE TEST ===" >> data/diag_log.txt
+          curl -s --max-time 10 'https://api.binance.com/api/v3/time' >> data/diag_log.txt 2>&1 || echo "FAILED" >> data/diag_log.txt
+          curl -s --max-time 10 'https://eapi.binance.com/eapi/v1/time' >> data/diag_log.txt 2>&1 || echo "FAILED" >> data/diag_log.txt
+          echo "=== DONE ===" >> data/diag_log.txt
+      - run: |
           git config user.name "Bot"
           git config user.email "bot@test"
           git add data/
-          git diff --staged --quiet || git commit -m "diag"
-          git push
+          git diff --staged --quiet || (git commit -m "diag" && git push)
